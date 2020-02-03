@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 #######################################################################
 #     Loading data into Pandas
@@ -6,7 +7,7 @@ import pandas as pd
 
 # df = pd.read_csv('pokemon_data.csv')
 # df_xlsx = pd.read_excel('pokemon_data.xlsx')
-df = pd.read_csv('pokemon_data.txt', delimiter='\t')
+# df = pd.read_csv('pokemon_data.txt', delimiter='\t')
 
 # print(df)
 # print(df.columns)
@@ -78,5 +79,49 @@ df = pd.read_csv('pokemon_data.txt', delimiter='\t')
 #     Filtering Data
 #######################################################################
 
-df.loc[df['Type 1'] == 'Grass']
-print(df)
+
+# use Bitwise AND "&" instead of Boolean AND "and"
+# new_df = df.loc[(df['Type 1'] == 'Grass') & (df['Type 2'] == 'Poison') & (df['HP'] > 70)]
+# # df = df.loc[(df['Type 1'] == 'Grass') | (df['Type 2'] == 'Poison')]
+# # new_df.to_csv('filtered.csv')
+# new_df.reset_index(drop=True, inplace=True)
+# print(new_df)
+
+# print(df.loc[df['Name'].str.contains('Mega ')])
+# print(df.loc[~df['Name'].str.contains('Mega ')])
+# print(df.loc[df['Type 1'].str.contains('fire|grass', flags=re.I, regex=True)])
+# print(df.loc[df['Name'].str.contains('^pi[a-z]*', flags=re.I, regex=True)])
+
+
+#######################################################################
+#     Conditional Changes
+#######################################################################
+
+# df.loc[df['Type 1'] == 'Flamer', 'Type 1'] = 'Fire'
+# df.loc[df['Type 1'] == 'Fire', 'Legendary'] = True
+# df.loc[df['Total'] > 500, ['Generation', 'Legendary']] = ['Test 1', 'Test 2']
+# print(df)
+
+
+#######################################################################
+#     Aggregate Statistics (Groupby)
+#######################################################################
+
+# df = pd.read_csv('modified.csv')
+# print(df.groupby(['Type 1']).mean().sort_values('Attack', ascending=False))
+# print(df.groupby(['Type 1']).sum())
+# df['count'] = 1
+# print(df)
+
+# print(df.groupby(['Type 1', 'Type 2']).count()['count'])
+
+
+#######################################################################
+#     Working with large amounts of data
+#######################################################################
+df = pd.read_csv('modified.csv')
+new_df = pd.DataFrame(columns=df.columns)
+for df in pd.read_csv('modified.csv', chunksize=5):
+  results = df.groupby(['Type 1']).count()
+  new_df = pd.concat([new_df, results], sort=False)
+print(new_df)
